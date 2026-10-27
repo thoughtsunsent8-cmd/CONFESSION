@@ -20,6 +20,7 @@
       }
       html {
         scroll-behavior: smooth;
+        overflow-anchor: none;
       }
       .page-loader {
         position: fixed;
@@ -39,6 +40,38 @@
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
+      }
+      .heart-transition {
+        position: fixed;
+        z-index: 250;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .heart-transition.is-active { visibility: visible; }
+      .transition-heart {
+        display: block;
+        width: min(62vmin, 560px);
+        height: auto;
+        opacity: 0;
+        transform: scale(0.08);
+        filter: drop-shadow(0 12px 22px #ba245b66)
+          drop-shadow(0 0 34px #f58dbb99);
+        transform-origin: center;
+        will-change: transform, opacity, filter;
+      }
+      .heart-transition.is-animating .transition-heart {
+        animation: big-heart-transition 1.85s cubic-bezier(0.2, 0.72, 0.2, 1) both;
+      }
+      .transition-heart-gloss {
+        opacity: 0;
+        transform-origin: center;
+      }
+      .heart-transition.is-animating .transition-heart-gloss {
+        animation: heart-gloss 1.6s ease-in-out both;
       }
       .page-loader-heart {
         color: #e34591;
@@ -110,6 +143,13 @@
           -apple-system,
           sans-serif;
       }
+      body.note-reading {
+        display: block;
+        overflow-anchor: none;
+      }
+      body.note-reading .note {
+        margin-inline: auto;
+      }
       body::before {
         position: fixed;
         z-index: -1;
@@ -145,6 +185,7 @@
         position: relative;
         isolation: isolate;
         overflow: hidden;
+        overflow-anchor: none;
         width: min(100%, 570px);
         padding: clamp(24px, 6vw, 44px);
         border: 1px solid #f0bdd3;
@@ -246,15 +287,15 @@
         pointer-events: none;
       }
       .cover.cover-returning {
-        animation: cover-return 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        will-change: opacity, transform, filter, clip-path;
+        animation: cover-soft-return 1.1s cubic-bezier(0.22, 0.68, 0.2, 1) both;
       }
       .note.note-opening {
         animation: note-opening 0.58s ease-out both;
       }
       .note.note-closing {
-        transform-origin: top center;
-        animation: note-mail-closing 0.62s cubic-bezier(0.55, 0, 0.8, 0.35)
-          both;
+        will-change: opacity, transform, filter, clip-path;
+        animation: note-soft-close 0.92s cubic-bezier(0.4, 0, 0.2, 1) both;
         pointer-events: none;
       }
       .note.note-opening::after {
@@ -2076,6 +2117,7 @@
       }
       .message {
         white-space: pre-line;
+        overflow-anchor: none;
       }
       .signature {
         margin-top: 20px;
@@ -2245,8 +2287,10 @@
           padding: 28px 15px 30px;
         }
         .note {
-          padding: 22px 10px;
+          padding: 22px 14px;
+          overflow: clip;
         }
+        .transition-heart { width: 78vmin; max-width: 92vw; }
         .cover-art {
           width: min(100%, 300px);
         }
@@ -2290,8 +2334,9 @@
           align-items: center;
         }
         .letter {
-          padding: 16px 14px;
-          line-height: 1.7;
+          padding: 18px 15px;
+          font-size: 0.94rem;
+          line-height: 1.72;
           overflow-wrap: anywhere;
         }
         .note > .letter,
@@ -2333,19 +2378,19 @@
         }
         .actions {
           display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 6px;
+          grid-template-columns: minmax(0, 1fr);
+          gap: 10px;
           margin-top: 18px;
         }
         .actions button {
           width: 100%;
           min-width: 0;
-          min-height: 44px;
-          padding: 7px 3px;
+          min-height: 50px;
+          padding: 11px 14px;
           justify-self: stretch;
-          font-size: 0.7rem;
-          line-height: 1.1;
-          white-space: nowrap;
+          font-size: 0.84rem;
+          line-height: 1.25;
+          white-space: normal;
         }
         .actions button:active {
           transform: scale(0.97);
@@ -2377,8 +2422,9 @@
           padding-inline: 12px;
         }
         .note {
-          padding: 20px 11px;
+          padding: 18px 10px;
         }
+        .transition-heart { width: 82vmin; max-width: 94vw; }
         .cover h1,
         .note h1 {
           font-size: clamp(1.7rem, 9vw, 2.1rem);
@@ -2407,6 +2453,8 @@
           grid-template-columns: auto 96px;
           gap: 7px;
         }
+        .letter { padding: 15px 11px; font-size: 0.88rem; }
+        .actions button { min-height: 48px; font-size: 0.8rem; }
       }
       @media (max-width: 420px) {
         .cover {
@@ -2598,15 +2646,36 @@
           transform: translateY(-10px) scale(0.985);
         }
       }
-      @keyframes cover-return {
+      @keyframes cover-soft-return {
         from {
           opacity: 0;
-          transform: translateY(10px) scale(0.99);
+          transform: translateY(7px) scale(0.98);
         }
         to {
           opacity: 1;
           transform: translateY(0) scale(1);
         }
+      }
+      @keyframes note-soft-close {
+        from {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+        to {
+          opacity: 0;
+          transform: translateY(8px) scale(0.975);
+        }
+      }
+      @keyframes big-heart-transition {
+        0% { opacity: 0; transform: scale(0.08); }
+        24% { opacity: 1; transform: scale(0.72); }
+        60% { opacity: 1; transform: scale(1.45); }
+        100% { opacity: 0; transform: scale(3.45); }
+      }
+      @keyframes heart-gloss {
+        0%, 100% { opacity: 0; transform: translate(-7px, -4px); }
+        32% { opacity: 0.82; transform: translate(0, 0); }
+        68% { opacity: 0.44; transform: translate(5px, 3px); }
       }
       @keyframes note-closing {
         to {
@@ -3231,6 +3300,43 @@
     <div class="page-loader" id="page-loader" role="status" aria-label="Loading your note">
       <span class="page-loader-heart">♥</span>
       <span>Preparing something special…</span>
+    </div>
+    <div class="heart-transition" id="heart-transition" aria-hidden="true">
+      <svg class="transition-heart" viewBox="0 0 240 220" role="presentation">
+        <defs>
+          <linearGradient id="transition-heart-fill" x1="0" y1="0" x2="0.85" y2="1">
+            <stop offset="0" stop-color="#ffb7d3" />
+            <stop offset="0.42" stop-color="#f45a9c" />
+            <stop offset="1" stop-color="#c91f67" />
+          </linearGradient>
+          <linearGradient id="transition-heart-gloss-fill" x1="0" y1="0" x2="0.8" y2="1">
+            <stop offset="0" stop-color="#fff" stop-opacity="0.82" />
+            <stop offset="1" stop-color="#fff" stop-opacity="0" />
+          </linearGradient>
+          <clipPath id="transition-heart-clip">
+            <path d="M120 211C104 196 17 130 17 72 17 39 41 16 73 16c22 0 39 13 47 34 8-21 25-34 47-34 32 0 56 23 56 56 0 58-87 124-103 139Z" />
+          </clipPath>
+        </defs>
+        <path
+          d="M120 211C104 196 17 130 17 72 17 39 41 16 73 16c22 0 39 13 47 34 8-21 25-34 47-34 32 0 56 23 56 56 0 58-87 124-103 139Z"
+          fill="url(#transition-heart-fill)"
+          stroke="#fff0f6"
+          stroke-width="3"
+          stroke-linejoin="round"
+        />
+        <g clip-path="url(#transition-heart-clip)">
+          <ellipse class="transition-heart-gloss" cx="78" cy="53" rx="52" ry="26" fill="url(#transition-heart-gloss-fill)" transform="rotate(-24 78 53)" />
+          <path d="M37 82c5-23 20-38 42-43" fill="none" stroke="#fff" stroke-opacity=".62" stroke-width="5" stroke-linecap="round" />
+          <path d="M44 97c4-8 9-15 16-21" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="3" stroke-linecap="round" />
+        </g>
+        <path
+          d="M120 211C104 196 17 130 17 72 17 39 41 16 73 16c22 0 39 13 47 34 8-21 25-34 47-34 32 0 56 23 56 56 0 58-87 124-103 139Z"
+          fill="none"
+          stroke="#cf3d79"
+          stroke-opacity=".48"
+          stroke-width="1.5"
+        />
+      </svg>
     </div>
     <main class="cover" id="cover" aria-labelledby="cover-title">
       <div class="ambient-petals" aria-hidden="true">
@@ -5127,81 +5233,47 @@ Take care always, and I hope life continues to give you reasons to smile.
       const messageElement = document.getElementById("message");
       const messageSource = document.getElementById("letter-message-source");
       let typingTimer = null;
-      let typingScrollFrame = null;
-      let userPausedAutoScroll = false;
-      function pauseAutoScrollForUser() {
-        userPausedAutoScroll = true;
-        window.cancelAnimationFrame(typingScrollFrame);
-        typingScrollFrame = null;
-      }
-      window.addEventListener("wheel", pauseAutoScrollForUser, { passive: true });
-      window.addEventListener("touchmove", pauseAutoScrollForUser, { passive: true });
-      window.addEventListener("keydown", (event) => {
-        if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(event.key))
-          pauseAutoScrollForUser();
-      });
-      function gentlyFollowTyping() {
-        if (userPausedAutoScroll) return;
-        window.cancelAnimationFrame(typingScrollFrame);
-        const follow = () => {
-          if (!messageElement || note.hidden) return;
-          const bottom = messageElement.getBoundingClientRect().bottom;
-          const safeBottom = window.innerHeight - 96;
-          if (bottom <= safeBottom) return;
-          window.scrollBy(0, 0.8);
-          typingScrollFrame = window.requestAnimationFrame(follow);
-        };
-        typingScrollFrame = window.requestAnimationFrame(follow);
-      }
       function startTypingMessage() {
         if (!messageElement || messageElement.dataset.typed === "true") return;
-        userPausedAutoScroll = false;
         const text = messageSource?.content.textContent.trim() || "";
+        if (typingTimer) {
+          window.clearInterval(typingTimer);
+          typingTimer = null;
+        }
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
           messageElement.textContent = text;
           messageElement.dataset.typed = "true";
           return;
         }
         let characterIndex = 0;
-        messageElement.textContent = "";
-        typingTimer = window.setInterval(() => {
-          messageElement.textContent = text.slice(0, characterIndex + 1);
-          gentlyFollowTyping();
+        const typedText = document.createTextNode("");
+        messageElement.replaceChildren(typedText);
+        const typeNextCharacter = () => {
+          if (!messageElement.isConnected || note.hidden) {
+            typingTimer = null;
+            return;
+          }
+          typedText.appendData(text.charAt(characterIndex));
           characterIndex += 1;
           if (characterIndex >= text.length) {
-            window.clearInterval(typingTimer);
+            typingTimer = null;
             messageElement.dataset.typed = "true";
+            return;
           }
-        }, 12);
-      }
-      function skipTypingMessage() {
-        if (!messageElement || messageElement.dataset.typed === "true") return;
-        if (typingTimer) {
-          window.clearInterval(typingTimer);
-          typingTimer = null;
-        }
-        window.cancelAnimationFrame(typingScrollFrame);
-        typingScrollFrame = null;
-        messageElement.textContent = messageSource?.content.textContent.trim() || "";
-        messageElement.dataset.typed = "true";
+          typingTimer = window.setTimeout(typeNextCharacter, 18);
+        };
+        typingTimer = window.setTimeout(typeNextCharacter, 18);
       }
       function resetTypingMessage() {
         if (typingTimer) {
-          window.clearInterval(typingTimer);
+          window.clearTimeout(typingTimer);
           typingTimer = null;
         }
-        window.cancelAnimationFrame(typingScrollFrame);
-        typingScrollFrame = null;
         if (messageElement) {
           messageElement.textContent = "";
           messageElement.dataset.typed = "false";
         }
       }
-      note.addEventListener("pointerdown", (event) => {
-        if (event.target.closest("button, textarea, input, .photo-card, a"))
-          return;
-        skipTypingMessage();
-      });
       const openNoteButton = document.getElementById("open-note");
       openNoteButton.addEventListener("click", () => {
         if (openNoteButton.disabled) return;
@@ -5218,11 +5290,12 @@ Take care always, and I hope life continues to give you reasons to smile.
             cover.hidden = true;
             cover.classList.remove("cover-closing");
             coverArt.classList.remove("opening-glow");
+            document.body.classList.add("note-reading");
             note.hidden = false;
             startTypingMessage();
             note.classList.add("note-opening");
             note.setAttribute("tabindex", "-1");
-            note.focus();
+            note.focus({ preventScroll: true });
             window.setTimeout(
               () => note.classList.remove("note-opening"),
               1250,
@@ -5235,6 +5308,7 @@ Take care always, and I hope life continues to give you reasons to smile.
         );
       });
       const restartNoteButton = document.getElementById("restart-note");
+      const heartTransition = document.getElementById("heart-transition");
       restartNoteButton.addEventListener("click", () => {
         if (restartNoteButton.disabled) return;
         const reducedMotion = window.matchMedia(
@@ -5242,36 +5316,33 @@ Take care always, and I hope life continues to give you reasons to smile.
         ).matches;
         restartNoteButton.disabled = true;
         resetTypingMessage();
-        if (!reducedMotion) note.classList.add("note-closing");
-        window.setTimeout(
-          () => {
-            note.hidden = true;
-            note.classList.remove("note-opening", "note-closing");
-            cover.hidden = false;
-            if (!reducedMotion) cover.classList.add("cover-returning");
-            document.getElementById("open-note").focus({ preventScroll: true });
-            window.setTimeout(
-              () => {
-                cover.classList.remove("cover-returning");
-                restartNoteButton.disabled = false;
-              },
-              reducedMotion ? 0 : 520,
-            );
-          },
-          reducedMotion ? 0 : 650,
-        );
-        document.getElementById("reply").textContent = "";
-        window.scrollTo({
-          top: 0,
-          behavior: window.matchMedia("(prefers-reduced-motion: reduce)")
-            .matches
-            ? "auto"
-            : "smooth",
-        });
-        if (!reducedMotion) {
-          animateFlower(coverArt.querySelector(".small-flower"), true);
-          showHeartPetals();
+        const showCover = () => {
+          note.hidden = true;
+          note.classList.remove("note-opening", "note-closing");
+          note.setAttribute("aria-hidden", "true");
+          document.body.classList.remove("note-reading");
+          cover.classList.remove("cover-closing", "cover-returning");
+          cover.hidden = false;
+          cover.removeAttribute("aria-hidden");
+          window.scrollTo({ top: 0, behavior: reducedMotion ? "auto" : "smooth" });
+          document.getElementById("open-note").focus({ preventScroll: true });
+        };
+        if (reducedMotion) {
+          showCover();
+          restartNoteButton.disabled = false;
+        } else {
+          note.classList.add("note-closing");
+          heartTransition.classList.remove("is-active", "is-animating");
+          heartTransition.classList.add("is-active");
+          void heartTransition.offsetWidth;
+          heartTransition.classList.add("is-animating");
+          window.setTimeout(showCover, 920);
+          window.setTimeout(() => {
+            heartTransition.classList.remove("is-animating", "is-active");
+            restartNoteButton.disabled = false;
+          }, 1900);
         }
+        document.getElementById("reply").textContent = "";
       });
       const sealButton = document.getElementById("seal-button");
       let sealSparkleTimer;
