@@ -5148,7 +5148,18 @@ Take care always, and I hope life continues to give you reasons to smile.
             window.clearInterval(typingTimer);
             messageElement.dataset.typed = "true";
           }
-        }, 34);
+        }, 12);
+      }
+      function skipTypingMessage() {
+        if (!messageElement || messageElement.dataset.typed === "true") return;
+        if (typingTimer) {
+          window.clearInterval(typingTimer);
+          typingTimer = null;
+        }
+        window.cancelAnimationFrame(typingScrollFrame);
+        typingScrollFrame = null;
+        messageElement.textContent = messageSource?.content.textContent.trim() || "";
+        messageElement.dataset.typed = "true";
       }
       function resetTypingMessage() {
         if (typingTimer) {
@@ -5162,6 +5173,11 @@ Take care always, and I hope life continues to give you reasons to smile.
           messageElement.dataset.typed = "false";
         }
       }
+      note.addEventListener("pointerdown", (event) => {
+        if (event.target.closest("button, textarea, input, .photo-card, a"))
+          return;
+        skipTypingMessage();
+      });
       const openNoteButton = document.getElementById("open-note");
       openNoteButton.addEventListener("click", () => {
         if (openNoteButton.disabled) return;
