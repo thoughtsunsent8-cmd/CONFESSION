@@ -5104,7 +5104,20 @@ Take care always, and I hope life continues to give you reasons to smile.
       const messageSource = document.getElementById("letter-message-source");
       let typingTimer = null;
       let typingScrollFrame = null;
+      let userPausedAutoScroll = false;
+      function pauseAutoScrollForUser() {
+        userPausedAutoScroll = true;
+        window.cancelAnimationFrame(typingScrollFrame);
+        typingScrollFrame = null;
+      }
+      window.addEventListener("wheel", pauseAutoScrollForUser, { passive: true });
+      window.addEventListener("touchmove", pauseAutoScrollForUser, { passive: true });
+      window.addEventListener("keydown", (event) => {
+        if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(event.key))
+          pauseAutoScrollForUser();
+      });
       function gentlyFollowTyping() {
+        if (userPausedAutoScroll) return;
         window.cancelAnimationFrame(typingScrollFrame);
         const follow = () => {
           if (!messageElement || note.hidden) return;
@@ -5118,6 +5131,7 @@ Take care always, and I hope life continues to give you reasons to smile.
       }
       function startTypingMessage() {
         if (!messageElement || messageElement.dataset.typed === "true") return;
+        userPausedAutoScroll = false;
         const text = messageSource?.content.textContent.trim() || "";
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
           messageElement.textContent = text;
