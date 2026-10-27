@@ -3201,6 +3201,30 @@
         .comment-box { font-size: 16px; }
         .cover-flower, .cover-bloom { transform: scale(0.8); }
       }
+      @media (max-width: 560px) {
+        html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
+        body { min-width: 0; }
+        .cover,
+        .note { padding-inline: 12px; }
+        .note { padding-top: 18px; padding-bottom: 22px; }
+        .note h1 { font-size: clamp(1.65rem, 8vw, 2.2rem); line-height: 1.08; }
+        .intro { font-size: 0.9rem; line-height: 1.55; }
+        .cover-art { width: min(78vw, 250px); }
+        .message-photos { width: 100%; height: 270px; min-height: 270px; border-radius: 22px; }
+        .message-photos .photo-card.photo-one:not(.is-enlarged) { width: 58%; }
+        .message-photos .photo-card.is-enlarged { width: 88% !important; }
+        .photo-flower { transform: scale(0.72); }
+        .letter { padding: 13px 11px; font-size: 0.88rem; line-height: 1.62; }
+        .actions { grid-template-columns: 1fr; gap: 9px; }
+        .actions button { min-height: 48px; font-size: 0.82rem; white-space: normal; }
+        .comment-box { min-height: 130px; font-size: 16px; }
+        .comment-send { width: 100%; min-height: 46px; }
+        .music-player { width: 100%; }
+        .music-visualizer { width: min(150px, 62vw); height: 48px; gap: 5px; }
+        .music-visualizer span { width: 9px; height: 44px; }
+        .music-heading { max-width: 100%; overflow: hidden; }
+        .music-heading > span:last-child { max-width: 90vw; overflow-wrap: anywhere; }
+      }
     </style>
   </head>
   <body>
